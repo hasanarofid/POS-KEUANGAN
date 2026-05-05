@@ -221,9 +221,11 @@
 
         .note-box {
             width: 55%;
-            height: 35px;
+            min-height: 35px;
+            height: auto;
             border: 1px solid #000;
             padding: 5px;
+            font-size: 11px;
         }
 
         .total-container {
@@ -420,7 +422,7 @@
         <!-- Footer / Summary -->
         <div class="footer-grid">
             <div class="note-box">
-                {{-- Placeholder for notes if any --}}
+                {!! nl2br(e($sale->note)) !!}
             </div>
             <div class="total-container">
                 @if(($sale->discount_invoice ?? 0) > 0 || ($sale->shipping_cost ?? 0) > 0 || ($sale->ppn_amount ?? 0) > 0)

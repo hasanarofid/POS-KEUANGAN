@@ -186,10 +186,10 @@ class SaleResource extends Resource
                                     ->label('Jumlah')
                                     ->required()
                                     ->default(1)
-                                    ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
+                                    ->mask(RawJs::make("\$money(\$input, ',', '.', 2)"))
                                     ->stripCharacters('.')
                                     ->live(onBlur: true)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 2, ',', '.'))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(fn(Forms\Get $get, Forms\Set $set) => self::updateItemSubtotal($get, $set))
                                     ->columnSpan(1),
@@ -197,10 +197,10 @@ class SaleResource extends Resource
                                     ->label('Harga')
                                     ->required()
                                     ->prefix('Rp')
-                                    ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
+                                    ->mask(RawJs::make("\$money(\$input, ',', '.', 2)"))
                                     ->stripCharacters('.')
                                     ->live(onBlur: true)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 2, ',', '.'))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                                         self::updateItemSubtotal($get, $set);
@@ -312,12 +312,29 @@ class SaleResource extends Resource
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(fn (Forms\Get $get, Forms\Set $set) => self::calculateTotals($get, $set)),
                             ]),
+                        Forms\Components\Checkbox::make('is_ppn')
+                            ->label(fn () => 'Gunakan PPN (' . \App\Models\Setting::get('ppn_percentage', 11) . '%)')
+                            ->live()
+                            ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, $state) {
+                                if (!$state) {
+                                    $set('ppn_amount', 0);
+                                }
+                                self::calculateTotals($get, $set);
+                            }),
                         Forms\Components\TextInput::make('ppn_amount')
-                                    ->label('PPN (11%)')
-                                    ->readOnly()
+                                    ->label(fn () => 'PPN (' . \App\Models\Setting::get('ppn_percentage', 11) . '%)')
                                     ->prefix('Rp')
-                                    ->formatStateUsing(fn ($state) => self::formatMoney($state))
-                                    ->dehydrateStateUsing(fn ($state) => self::parseNumber($state)),
+                                    ->mask(RawJs::make("\$money(\$input, ',', '.', 2)"))
+                                    ->stripCharacters('.')
+                                    ->live(debounce: 500)
+                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 2, ',', '.'))
+                                    ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
+                                    ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $state) {
+                                        if (self::parseNumber($state) > 0) {
+                                            $set('is_ppn', true);
+                                        }
+                                        self::calculateTotals($get, $set, isPpnManual: true);
+                                    }),
                                 Forms\Components\TextInput::make('grand_total')
                                     ->readOnly()
                                     ->prefix('Rp')
@@ -334,7 +351,7 @@ class SaleResource extends Resource
 
     public static function formatMoney($value): string
     {
-        return number_format(self::parseNumber($value), 0, ',', '.');
+        return number_format(self::parseNumber($value), 2, ',', '.');
     }
 
     public static function parseNumber($value): float
@@ -345,7 +362,7 @@ class SaleResource extends Resource
 
         // If it's already a float/int (from DB or already parsed state)
         if (is_float($value) || is_int($value)) {
-            return round((float)$value);
+            return (float)$value;
         }
 
         $value = (string)$value;
@@ -387,7 +404,7 @@ class SaleResource extends Resource
         self::calculateTotals($get, $set);
     }
 
-    public static function calculateTotals(Forms\Get $get, Forms\Set $set): void
+    public static function calculateTotals(Forms\Get $get, Forms\Set $set, bool $isPpnManual = false): void
     {
         // Get items. One of these will work depending on the current scope.
         $items = collect($get('items') ?? $get('../../items') ?? []);
@@ -409,7 +426,14 @@ class SaleResource extends Resource
         $isPpn = $get('is_ppn') ?? $get('../../is_ppn') ?? false;
 
         $baseTotal = $subtotal - $discountInvoice;
-        $ppnAmount = $isPpn ? round($baseTotal * 0.11) : 0;
+        
+        if ($isPpnManual) {
+            $ppnAmount = self::parseNumber($get('ppn_amount') ?? $get('../../ppn_amount') ?? 0);
+        } else {
+            $ppnPercentage = (float) \App\Models\Setting::get('ppn_percentage', 11);
+            $ppnAmount = $isPpn ? round($baseTotal * ($ppnPercentage / 100), 2) : 0;
+        }
+
         $grandTotal = $baseTotal + $ppnAmount + $shippingCost;
 
         // Detect if we're inside a repeater row by checking for item-specific fields

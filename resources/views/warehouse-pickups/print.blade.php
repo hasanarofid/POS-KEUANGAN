@@ -221,7 +221,8 @@
 
         .note-box {
             width: 100%;
-            height: 35px;
+            min-height: 35px;
+            height: auto;
             border: 1px solid #000;
             padding: 5px;
             font-size: 11px;
@@ -414,7 +415,11 @@
         <!-- Footer / Summary -->
         <div class="footer-grid">
             <div class="note-box">
-                Catatan: Barang yang sudah dibeli tidak dapat ditukar/dikembalikan.
+                @if($warehousePickup->note)
+                    {!! nl2br(e($warehousePickup->note)) !!}
+                @else
+                    Catatan: Barang yang sudah dibeli tidak dapat ditukar/dikembalikan.
+                @endif
             </div>
         </div>
 
