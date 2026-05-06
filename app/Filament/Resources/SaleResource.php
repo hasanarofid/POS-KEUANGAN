@@ -137,7 +137,7 @@ class SaleResource extends Resource
                                     // ])
 
                                     ->live()
-                                    ->columnSpan(3)
+                                    ->columnSpan(4)
                                     ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
                                         $product = \App\Models\Product::find($state);
                                         if ($product) {
@@ -151,7 +151,7 @@ class SaleResource extends Resource
                                                 'KG' => $product->price,
                                                 default => $product->price,
                                             };
-                                            $set('price', number_format($price, 0, ',', '.'));
+                                            $set('price', self::formatNumber($price));
                                             $set('quantity', 1);
                                         }
                                         self::updateItemSubtotal($get, $set);
@@ -161,7 +161,7 @@ class SaleResource extends Resource
                                     ->placeholder('Isi jika ada keterangan tambahan atau manual')
                                     ->dehydrated()
                                     ->nullable()
-                                    ->columnSpan(4),
+                                    ->columnSpan(8),
 
                                  Forms\Components\TextInput::make('unit')
                                     ->label('Satuan')
@@ -178,7 +178,7 @@ class SaleResource extends Resource
                                                 'KG' => $product->price,
                                                 default => $product->price,
                                             };
-                                            $set('price', number_format($price, 0, ',', '.'));
+                                            $set('price', self::formatNumber($price));
                                         }
                                         self::updateItemSubtotal($get, $set);
                                     }),
@@ -186,10 +186,9 @@ class SaleResource extends Resource
                                     ->label('Jumlah')
                                     ->required()
                                     ->default(1)
-                                    ->mask(RawJs::make("\$money(\$input, ',', '.', 2)"))
-                                    ->stripCharacters('.')
+                                    ->extraInputAttributes(['onkeypress' => 'return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46 || event.charCode === 44'])
                                     ->live(onBlur: true)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 2, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => self::formatNumber($state))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(fn(Forms\Get $get, Forms\Set $set) => self::updateItemSubtotal($get, $set))
                                     ->columnSpan(1),
@@ -198,21 +197,20 @@ class SaleResource extends Resource
                                     ->required()
                                     ->prefix('Rp')
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 2)"))
-                                    ->stripCharacters('.')
                                     ->live(onBlur: true)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 2, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => self::formatNumber($state))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                                         self::updateItemSubtotal($get, $set);
                                     })
-                                    ->columnSpan(2),
+                                    ->columnSpan(3),
                                 Forms\Components\TextInput::make('discount_percent')
                                     ->label('Diskon %')
                                     ->numeric()
                                     ->default(0)
                                     ->live()
-                                    ->extraInputAttributes(['onkeypress' => 'return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46'])
-                                    ->dehydrateStateUsing(fn ($state) => $state === null || $state === '' ? 0 : (float) $state)
+                                    ->extraInputAttributes(['onkeypress' => 'return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46 || event.charCode === 44'])
+                                    ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $state) {
                                         $price = self::parseNumber($get('price') ?? 0);
                                         $qty = self::parseNumber($get('quantity') ?? 1);
@@ -228,9 +226,8 @@ class SaleResource extends Resource
                                     ->default(0)
                                     ->prefix('Rp')
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
-                                    ->stripCharacters('.')
                                     ->live(onBlur: true)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => self::formatNumber($state, 0))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $state) {
                                         $price = self::parseNumber($get('price') ?? 0);
@@ -244,14 +241,14 @@ class SaleResource extends Resource
                                         $set('discount_item', self::formatMoney($nominal));
                                         self::updateItemSubtotal($get, $set);
                                     })
-                                    ->columnSpan(2),
+                                    ->columnSpan(3),
                                 Forms\Components\TextInput::make('subtotal')
                                     ->required()
                                     ->readOnly()
                                     ->prefix('Rp')
                                     ->formatStateUsing(fn ($state) => self::formatMoney($state))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
-                                    ->columnSpan(2),
+                                    ->columnSpan(3),
                             ])
                             ->columns(12)
                             ->live()
@@ -265,10 +262,8 @@ class SaleResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('subtotal')
                             ->readOnly()
-                            ->prefix('Rp')
                             ->formatStateUsing(fn ($state) => self::formatMoney($state))
-                            ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
-                            ->afterStateHydrated(fn (Forms\Get $get, Forms\Set $set) => self::calculateTotals($get, $set)),
+                            ->dehydrateStateUsing(fn ($state) => self::parseNumber($state)),
                         Forms\Components\Grid::make(3)
                             ->schema([
                                 Forms\Components\TextInput::make('discount_invoice_percent')
@@ -277,7 +272,7 @@ class SaleResource extends Resource
                                     ->default(0)
                                     ->live()
                                     ->extraInputAttributes(['onkeypress' => 'return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46'])
-                                    ->dehydrateStateUsing(fn ($state) => $state === null || $state === '' ? 0 : (float) $state)
+                                    ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $state) {
                                         $subtotal = self::parseNumber($get('subtotal') ?? 0);
                                         $discountNominal = round($subtotal * (self::parseNumber($state) / 100));
@@ -289,9 +284,8 @@ class SaleResource extends Resource
                                     ->default(0)
                                     ->prefix('Rp')
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
-                                    ->stripCharacters('.')
                                     ->live(debounce: 500)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => self::formatNumber($state, 0))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $state) {
                                         $subtotal = self::parseNumber($get('subtotal') ?? 0);
@@ -306,9 +300,8 @@ class SaleResource extends Resource
                                     ->default(0)
                                     ->prefix('Rp')
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
-                                    ->stripCharacters('.')
                                     ->live(debounce: 500)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => self::formatNumber($state, 0))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(fn (Forms\Get $get, Forms\Set $set) => self::calculateTotals($get, $set)),
                             ]),
@@ -325,9 +318,8 @@ class SaleResource extends Resource
                                     ->label(fn () => 'PPN (' . \App\Models\Setting::get('ppn_percentage', 11) . '%)')
                                     ->prefix('Rp')
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 2)"))
-                                    ->stripCharacters('.')
                                     ->live(debounce: 500)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 2, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => self::formatNumber($state))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $state) {
                                         if (self::parseNumber($state) > 0) {
@@ -351,7 +343,14 @@ class SaleResource extends Resource
 
     public static function formatMoney($value): string
     {
-        return number_format(self::parseNumber($value), 2, ',', '.');
+        return self::formatNumber($value);
+    }
+
+    public static function formatNumber($value, $decimals = 2): string
+    {
+        if ($value === null || $value === '') return '';
+        $formatted = number_format(self::parseNumber($value), $decimals, ',', '.');
+        return rtrim(rtrim($formatted, '0'), ',');
     }
 
     public static function parseNumber($value): float
@@ -360,35 +359,58 @@ class SaleResource extends Resource
             return 0;
         }
 
-        // If it's already a float/int (from DB or already parsed state)
+        // If it's already a float/int
         if (is_float($value) || is_int($value)) {
             return (float)$value;
         }
 
         $value = (string)$value;
-        $value = str_replace(['Rp', ' '], '', $value);
+        $value = str_replace(['Rp', ' ', "\xc2\xa0"], '', $value); // Include non-breaking space
 
-        // Ambiguity check: if it's strictly a numeric string with one dot
-        // and NO thousands-formatting dots (e.g. "30000.00" vs "30.000")
-        if (preg_match('/^\d+\.\d+$/', $value)) {
-             // If there is ONLY one dot and it's followed by NO digits, 
-             // it might be a user just typed a dot.
-             $parts = explode('.', $value);
-             if (strlen($parts[1]) === 3) {
-                  // Looks like Indonesian thousands (1.000, 20.000).
-                  return (float)str_replace('.', '', $value);
-             }
-             
-             // If it's not strictly 3 digits, it's a standard decimal (DB float).
-             return (float)$value;
+        if ($value === '') return 0;
+
+        // Count dots and commas
+        $dotCount = substr_count($value, '.');
+        $commaCount = substr_count($value, ',');
+
+        // Case 1: Standard Indonesian (1.234,56)
+        if ($dotCount > 0 && $commaCount > 0) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+            return (float)$value;
         }
 
-        // For all other cases (multiple dots, or strings with dots at "wrong" places),
-        // we treat ALL dots as thousands separators.
-        $clean = str_replace('.', '', $value);
-        $clean = str_replace(',', '.', $clean); // Handle comma as decimal if any
-        
-        return (float)$clean;
+        // Case 2: Only dots (1.234 or 1.234.567 or 8.5)
+        if ($dotCount > 0 && $commaCount === 0) {
+            if ($dotCount > 1) {
+                // Multiple dots are always thousands
+                return (float)str_replace('.', '', $value);
+            }
+            
+            // Single dot: Ambiguous.
+            // If there are exactly 3 digits after the dot, treat as thousands (standard ID).
+            $parts = explode('.', $value);
+            if (strlen($parts[1]) === 3) {
+                return (float)str_replace('.', '', $value);
+            }
+            
+            // Otherwise, treat as decimal (like 8.5)
+            return (float)$value;
+        }
+
+        // Case 3: Only commas (1,234 or 8,5)
+        if ($commaCount > 0 && $dotCount === 0) {
+            if ($commaCount > 1) {
+                // Multiple commas? Treat as thousands
+                return (float)str_replace(',', '', $value);
+            }
+            
+            // Single comma: In Indonesia this is always a decimal.
+            return (float)str_replace(',', '.', $value);
+        }
+
+        // Case 4: No dots or commas
+        return (float)$value;
     }
 
     public static function updateItemSubtotal(Forms\Get $get, Forms\Set $set): void
@@ -414,10 +436,7 @@ class SaleResource extends Resource
         });
 
         $discountItemTotal = $items->sum(function ($item) {
-            $price = self::parseNumber($item['price'] ?? 0);
-            $quantity = self::parseNumber($item['quantity'] ?? 0);
-            $discount = self::parseNumber($item['discount_item'] ?? 0);
-            return $discount * $quantity;
+            return self::parseNumber($item['discount_item'] ?? 0);
         });
         
         $discountInvoice = self::parseNumber($get('discount_invoice') ?? $get('../../discount_invoice') ?? 0);

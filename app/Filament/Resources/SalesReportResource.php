@@ -39,7 +39,7 @@ class SalesReportResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('grand_total')
                     ->label('Total')
-                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) ($state ?? 0), 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => 'Rp ' . SaleResource::formatNumber($state))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()

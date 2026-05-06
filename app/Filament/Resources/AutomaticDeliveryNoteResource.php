@@ -179,7 +179,7 @@ class AutomaticDeliveryNoteResource extends Resource implements HasShieldPermiss
                                 Forms\Components\TextInput::make('quantity')
                                     ->label('Jumlah')
                                     ->numeric()
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                                     ->required()
                                     ->columnSpan(2),
                             ])

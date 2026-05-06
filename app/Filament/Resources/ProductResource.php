@@ -61,7 +61,7 @@ class ProductResource extends Resource
                         Forms\Components\TextInput::make('isi')
                             ->label(fn (Forms\Get $get) => 'Isi per ' . ($get('uom') ?? 'PCS') . ' / Dus')
                             ->numeric()
-                            ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                            ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state, 0))
                             ->default(1)
                             ->required()
                             ->live(onBlur: true)
@@ -69,7 +69,7 @@ class ProductResource extends Resource
                         Forms\Components\TextInput::make('isi_set')
                             ->label('Units per Set (Isi)')
                             ->numeric()
-                            ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                            ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state, 0))
                             ->default(1)
                             ->required()
                             ->hidden(fn (Forms\Get $get) => in_array($get('uom'), ['PCS', 'SET', 'KG'])),
@@ -85,7 +85,7 @@ class ProductResource extends Resource
                             ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
                             ->stripCharacters('.')
                             ->live(onBlur: true)
-                            ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                            ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                             ->dehydrateStateUsing(fn ($state) => SaleResource::parseNumber($state))
                             ->afterStateUpdated(fn (Forms\Get $get, Forms\Set $set) => self::calculateCartonPrice($get, $set))
                             ->default(0),
@@ -96,7 +96,7 @@ class ProductResource extends Resource
                             ->stripCharacters('.')
                             ->live(onBlur: true)
                             ->readOnly()
-                            ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                            ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                             ->dehydrateStateUsing(fn ($state) => SaleResource::parseNumber($state))
                             ->default(0),
                         Forms\Components\TextInput::make('price_per_set')
@@ -105,7 +105,7 @@ class ProductResource extends Resource
                             ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
                             ->stripCharacters('.')
                             ->live(onBlur: true)
-                            ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                            ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                             ->dehydrateStateUsing(fn ($state) => SaleResource::parseNumber($state))
                             ->default(0)
                             ->hidden(fn (Forms\Get $get) => in_array($get('uom'), ['PCS', 'SET', 'KG'])),
@@ -114,7 +114,7 @@ class ProductResource extends Resource
                             ->required()
                             ->default(0)
                             ->disabled()
-                            ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                            ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                             ->dehydrated(false),
                         Forms\Components\Textarea::make('description')
                             ->label('Deskripsi')
@@ -130,7 +130,7 @@ class ProductResource extends Resource
         
         $pricePerCarton = round($isi * $price);
         
-        $set('price_per_carton', number_format($pricePerCarton, 0, ',', '.'));
+        $set('price_per_carton', SaleResource::formatNumber($pricePerCarton));
     }
 
     public static function table(Table $table): Table
@@ -160,7 +160,7 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
                     ->label('Harga')
-                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) ($state ?? 0), 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => 'Rp ' . SaleResource::formatNumber($state))
                     ->color(fn (Product $record): string => $record->price == 0 ? 'danger' : 'success')
                     ->weight(fn (Product $record) => $record->price == 0 ? 'bold' : 'normal')
                     ->sortable(),

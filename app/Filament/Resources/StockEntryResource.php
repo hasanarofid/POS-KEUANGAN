@@ -101,7 +101,7 @@ class StockEntryResource extends Resource
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
                                     ->stripCharacters('.')
                                     ->live(onBlur: true)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                                     ->dehydrateStateUsing(fn ($state) => SaleResource::parseNumber($state))
                                     ->afterStateUpdated(fn (Forms\Get $get, Forms\Set $set) => self::updateTotalQuantity($get, $set)),
                                 Forms\Components\TextInput::make('quantity_unit')
@@ -110,14 +110,14 @@ class StockEntryResource extends Resource
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
                                     ->stripCharacters('.')
                                     ->live(onBlur: true)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                                     ->dehydrateStateUsing(fn ($state) => SaleResource::parseNumber($state))
                                     ->afterStateUpdated(fn (Forms\Get $get, Forms\Set $set) => self::updateTotalQuantity($get, $set)),
                                 Forms\Components\TextInput::make('quantity')
                                     ->label(fn (Forms\Get $get) => 'Total ' . (\App\Models\Product::find($get('product_id'))?->uom ?? 'Unit'))
                                     ->required()
                                     ->readOnly()
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                                     ->dehydrateStateUsing(fn ($state) => SaleResource::parseNumber($state))
                                     ->extraAttributes(['class' => 'bg-gray-100']),
                             ])

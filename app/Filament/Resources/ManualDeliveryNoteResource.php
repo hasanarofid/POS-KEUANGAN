@@ -216,7 +216,7 @@ class ManualDeliveryNoteResource extends Resource implements HasShieldPermission
                                     ->label('Jumlah')
                                     ->required()
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                                     ->dehydrateStateUsing(fn ($state) => (float) str_replace('.', '', $state))
                                     ->columnSpan(['md' => 1]),
                             ])

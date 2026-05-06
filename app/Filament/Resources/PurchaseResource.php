@@ -79,7 +79,7 @@ class PurchaseResource extends Resource
                                 Forms\Components\TextInput::make('quantity')
                                     ->label('Jumlah')
                                     ->numeric()
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                                     ->required()
                                     ->default(1)
                                     ->live(onBlur: true)
@@ -91,7 +91,7 @@ class PurchaseResource extends Resource
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
                                     ->stripCharacters('.')
                                     ->live(debounce: 500)
-                                    ->formatStateUsing(fn ($state) => number_format((float) ($state ?? 0), 0, ',', '.'))
+                                    ->formatStateUsing(fn ($state) => SaleResource::formatNumber($state))
                                     ->afterStateUpdated(fn (Forms\Get $get, Forms\Set $set) => self::updateItemSubtotal($get, $set)),
                                 Forms\Components\TextInput::make('subtotal')
                                     ->required()
@@ -119,7 +119,7 @@ class PurchaseResource extends Resource
 
     public static function formatMoney($value): string
     {
-        return number_format(self::parseNumber($value), 0, ',', '.');
+        return SaleResource::formatNumber($value);
     }
 
     public static function parseNumber($value): float
@@ -168,7 +168,7 @@ class PurchaseResource extends Resource
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total')
-                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) ($state ?? 0), 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => 'Rp ' . SaleResource::formatNumber($state))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
