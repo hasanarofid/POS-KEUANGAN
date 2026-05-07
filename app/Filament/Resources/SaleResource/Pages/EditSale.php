@@ -36,6 +36,7 @@ class EditSale extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        \Illuminate\Support\Facades\Log::info('mutateFormDataBeforeSave FINAL Output:', $data);
         unset($data['invoice_type']);
 
         return $data;

@@ -396,13 +396,19 @@
             </thead>
             <tbody>
                 @foreach($sale->items as $item)
+                @php
+                    $itemDiscountItem = (float)($item->discount_item ?? 0);
+                    $discountDisplay = $itemDiscountItem > 0 
+                        ? number_format($itemDiscountItem, 0, ',', '.') 
+                        : '-';
+                @endphp
                 <tr>
                     <td class="text-center">{{ rtrim(rtrim(number_format($item->quantity, 2, ',', '.'), '0'), ',') }}</td>
                     <td class="text-center">{{ $item->unit ?? ($item->product?->uom ?? 'Set') }}</td>
                     <td>{{ $item->product ? $item->product->name : ($item->description ?? '-') }}</td>
                     <td class="text-right">{{ rtrim(rtrim(number_format((float)($item->price ?? 0), 2, ',', '.'), '0'), ',') }}</td>
-                    <td class="text-right">{{ rtrim(rtrim(number_format((float)($item->discount_item ?? 0), 2, ',', '.'), '0'), ',') }}</td>
-                    <td class="text-right">{{ rtrim(rtrim(number_format((float)($item->subtotal ?? 0), 2, ',', '.'), '0'), ',') }}</td>
+                    <td class="text-right">{{ $discountDisplay }}</td>
+                    <td class="text-right">{{ number_format((float)($item->subtotal ?? 0), 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
                 {{-- Fill empty rows to maintain box height --}}
@@ -429,31 +435,37 @@
                 <div class="summary-details">
                     <div class="summary-row">
                         <span class="summary-label">Subtotal</span>
-                        <span class="summary-value">{{ rtrim(rtrim(number_format((float)($sale->subtotal ?? 0), 2, ',', '.'), '0'), ',') }}</span>
+                        <span class="summary-value">{{ number_format((float)($sale->subtotal ?? 0), 0, ',', '.') }}</span>
                     </div>
                     @if(($sale->discount_invoice ?? 0) > 0)
                     <div class="summary-row">
-                        <span class="summary-label">Diskon</span>
-                        <span class="summary-value">-{{ rtrim(rtrim(number_format((float)($sale->discount_invoice ?? 0), 2, ',', '.'), '0'), ',') }}</span>
+                        @php
+                            $discInvPct = (float)($sale->discount_invoice_percent ?? 0);
+                            $discLabel = $discInvPct > 0
+                                ? 'Diskon '
+                                : 'Diskon';
+                        @endphp
+                        <span class="summary-label">{{ $discLabel }}</span>
+                        <span class="summary-value">-{{ number_format((float)($sale->discount_invoice ?? 0), 0, ',', '.') }}</span>
                     </div>
                     @endif
                     @if(($sale->ppn_amount ?? 0) > 0)
                     <div class="summary-row">
                         <span class="summary-label">PPN</span>
-                        <span class="summary-value">{{ rtrim(rtrim(number_format((float)($sale->ppn_amount ?? 0), 2, ',', '.'), '0'), ',') }}</span>
+                        <span class="summary-value">{{ number_format((float)($sale->ppn_amount ?? 0), 0, ',', '.') }}</span>
                     </div>
                     @endif
                     @if(($sale->shipping_cost ?? 0) > 0)
                     <div class="summary-row">
                         <span class="summary-label">Ongkos Kirim</span>
-                        <span class="summary-value">{{ rtrim(rtrim(number_format((float)($sale->shipping_cost ?? 0), 2, ',', '.'), '0'), ',') }}</span>
+                        <span class="summary-value">{{ number_format((float)($sale->shipping_cost ?? 0), 0, ',', '.') }}</span>
                     </div>
                     @endif
                 </div>
                 @endif
                 <div class="total-box">
                     <div class="total-label">Total</div>
-                    <div class="total-value">{{ rtrim(rtrim(number_format((float)($sale->grand_total ?? 0), 2, ',', '.'), '0'), ',') }}</div>
+                    <div class="total-value">{{ number_format((float)($sale->grand_total ?? 0), 0, ',', '.') }}</div>
                 </div>
             </div>
         </div>

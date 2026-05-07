@@ -187,7 +187,7 @@ class SaleResource extends Resource
                                     ->required()
                                     ->default(1)
                                     ->extraInputAttributes(['onkeypress' => 'return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46 || event.charCode === 44'])
-                                    ->live(onBlur: true)
+                                    ->live(debounce: 500)
                                     ->formatStateUsing(fn ($state) => self::formatNumber($state))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(fn(Forms\Get $get, Forms\Set $set) => self::updateItemSubtotal($get, $set))
@@ -197,7 +197,7 @@ class SaleResource extends Resource
                                     ->required()
                                     ->prefix('Rp')
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 2)"))
-                                    ->live(onBlur: true)
+                                    ->live(debounce: 500)
                                     ->formatStateUsing(fn ($state) => self::formatNumber($state))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
@@ -208,8 +208,9 @@ class SaleResource extends Resource
                                     ->label('Diskon %')
                                     ->numeric()
                                     ->default(0)
-                                    ->live()
+                                    ->live(debounce: 500)
                                     ->extraInputAttributes(['onkeypress' => 'return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46 || event.charCode === 44'])
+                                    ->formatStateUsing(fn ($state) => $state !== null ? rtrim(rtrim(number_format((float)$state, 2, '.', ''), '0'), '.') : '0')
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $state) {
                                         $price = self::parseNumber($get('price') ?? 0);
@@ -226,7 +227,7 @@ class SaleResource extends Resource
                                     ->default(0)
                                     ->prefix('Rp')
                                     ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
-                                    ->live(onBlur: true)
+                                    ->live(debounce: 500)
                                     ->formatStateUsing(fn ($state) => self::formatNumber($state, 0))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $state) {
@@ -248,6 +249,7 @@ class SaleResource extends Resource
                                     ->prefix('Rp')
                                     ->formatStateUsing(fn ($state) => self::formatMoney($state))
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
+                                    ->dehydrated()
                                     ->columnSpan(3),
                             ])
                             ->columns(12)
@@ -263,15 +265,17 @@ class SaleResource extends Resource
                         Forms\Components\TextInput::make('subtotal')
                             ->readOnly()
                             ->formatStateUsing(fn ($state) => self::formatMoney($state))
-                            ->dehydrateStateUsing(fn ($state) => self::parseNumber($state)),
+                            ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
+                            ->dehydrated(),
                         Forms\Components\Grid::make(3)
                             ->schema([
                                 Forms\Components\TextInput::make('discount_invoice_percent')
                                     ->label('Diskon %')
                                     ->numeric()
                                     ->default(0)
-                                    ->live()
+                                    ->live(debounce: 500)
                                     ->extraInputAttributes(['onkeypress' => 'return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46'])
+                                    ->formatStateUsing(fn ($state) => $state !== null ? rtrim(rtrim(number_format((float)$state, 2, '.', ''), '0'), '.') : '0')
                                     ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $state) {
                                         $subtotal = self::parseNumber($get('subtotal') ?? 0);
@@ -331,7 +335,8 @@ class SaleResource extends Resource
                                     ->readOnly()
                                     ->prefix('Rp')
                                     ->formatStateUsing(fn ($state) => self::formatMoney($state))
-                                    ->dehydrateStateUsing(fn ($state) => self::parseNumber($state)),
+                                    ->dehydrateStateUsing(fn ($state) => self::parseNumber($state))
+                                    ->dehydrated(),
                         Forms\Components\Textarea::make('note')
                             ->label('Catatan')
                             ->columnSpanFull(),
@@ -349,8 +354,25 @@ class SaleResource extends Resource
     public static function formatNumber($value, $decimals = 2): string
     {
         if ($value === null || $value === '') return '';
-        $formatted = number_format(self::parseNumber($value), $decimals, ',', '.');
-        return rtrim(rtrim($formatted, '0'), ',');
+        $parsed = self::parseNumber($value);
+
+        // For 0 decimals: return directly without rtrim
+        // (rtrim would incorrectly strip zeros from thousands separator, e.g. "51.000" → "51.")
+        if ($decimals === 0) {
+            return number_format($parsed, 0, ',', '.');
+        }
+
+        // For decimals > 0: only trim trailing zeros AFTER the decimal comma, not the whole string
+        $formatted = number_format($parsed, $decimals, ',', '.');
+        $parts = explode(',', $formatted);
+        if (count($parts) === 2) {
+            $decimal = rtrim($parts[1], '0');
+            if ($decimal === '') {
+                return $parts[0]; // e.g. "85.000" instead of "85.000,"
+            }
+            return $parts[0] . ',' . $decimal; // e.g. "8,5"
+        }
+        return $formatted;
     }
 
     public static function parseNumber($value): float
@@ -428,8 +450,18 @@ class SaleResource extends Resource
 
     public static function calculateTotals(Forms\Get $get, Forms\Set $set, bool $isPpnManual = false): void
     {
-        // Get items. One of these will work depending on the current scope.
-        $items = collect($get('items') ?? $get('../../items') ?? []);
+        // Improved items detection for different scopes
+        $itemsData = $get('items');
+        $isInRow = false;
+        
+        if ($itemsData === null) {
+            $itemsData = $get('../../items');
+            if ($itemsData !== null) {
+                $isInRow = true;
+            }
+        }
+        
+        $items = collect($itemsData ?? []);
         
         $subtotal = $items->sum(function ($item) {
             return self::parseNumber($item['subtotal'] ?? 0);
@@ -454,9 +486,6 @@ class SaleResource extends Resource
         }
 
         $grandTotal = $baseTotal + $ppnAmount + $shippingCost;
-
-        // Detect if we're inside a repeater row by checking for item-specific fields
-        $isInRow = $get('price') !== null || $get('quantity') !== null;
 
         if ($isInRow) {
             $set('../../subtotal', self::formatMoney($subtotal));
