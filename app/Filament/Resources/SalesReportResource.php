@@ -20,7 +20,7 @@ class SalesReportResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
     protected static ?string $navigationLabel = 'Laporan Penjualan';
     protected static ?string $navigationGroup = 'Laporan';
-    protected static ?int $navigationSort = 41;
+    protected static ?int $navigationSort = 1;
     protected static ?string $slug = 'laporan-penjualan';
 
     public static function table(Table $table): Table

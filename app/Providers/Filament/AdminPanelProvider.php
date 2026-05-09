@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Models\Setting;
 use Filament\Http\Middleware\Authenticate;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -28,10 +29,21 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('MR Lux Indonesia Panel Admin')
-            ->brandLogo(asset('images/LOGO-MR-LUX-INDONESIA.webp'))
+            ->brandName(fn () => Setting::get('site_name', 'POS KEUANGAN'))
+            ->brandLogo(function () {
+                $logo = Setting::get('site_logo');
+                if (!$logo) return asset('images/logo-default.png');
+                // Path yang dimulai 'images/' berarti ada di public langsung
+                if (str_starts_with($logo, 'images/')) return asset($logo);
+                return asset('storage/' . $logo);
+            })
             ->brandLogoHeight('3rem')
-            ->favicon(asset('images/favicon.png'))
+            ->favicon(function () {
+                $favicon = Setting::get('site_favicon');
+                if (!$favicon) return asset('images/logo-default.png');
+                if (str_starts_with($favicon, 'images/')) return asset($favicon);
+                return asset('storage/' . $favicon);
+            })
             ->darkMode(true)
             ->defaultThemeMode(\Filament\Enums\ThemeMode::Light)
             ->colors([
@@ -43,11 +55,13 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->navigationGroups([
                 'Master Data',
-                'Produksi',
-                'Pembelian',
+                'Transaksi',
                 'Penjualan',
+                'Pembelian',
+                'Produksi',
                 'Laporan',
                 'User Management',
+                'Sistem',
             ])
             ->pages([
                 Pages\Dashboard::class,

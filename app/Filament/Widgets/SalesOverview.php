@@ -9,28 +9,34 @@ class SalesOverview extends BaseWidget
 {
     protected function getStats(): array
     {
+        $totalSales = \App\Models\Sale::where('status', 'Lunas')->sum('grand_total');
+        $totalPurchases = \App\Models\Purchase::sum('total');
+        $totalExpenses = \App\Models\Expense::sum('amount');
+        $profit = $totalSales - $totalPurchases - $totalExpenses;
+
         return [
-            \Filament\Widgets\StatsOverviewWidget\Stat::make('Total Penjualan', 'Rp ' . number_format(\App\Models\Sale::where('status', 'Lunas')->sum('grand_total'), 0, ',', '.'))
-                ->description('Total pendapatan dari semua penjualan (Lunas)')
+            Stat::make('Total Penjualan (Lunas)', 'Rp ' . number_format($totalSales, 0, ',', '.'))
+                ->description('Total pendapatan bersih')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
-            \Filament\Widgets\StatsOverviewWidget\Stat::make('Invoice Belum Dibayar', \App\Models\Sale::where('status', 'Belum Lunas')->count())
-                ->description('Total invoice yang belum dibayar')
+            Stat::make('Total Pembelian', 'Rp ' . number_format($totalPurchases, 0, ',', '.'))
+                ->description('Total belanja stok')
+                ->descriptionIcon('heroicon-m-shopping-cart')
+                ->color('warning'),
+            Stat::make('Total Pengeluaran Kas', 'Rp ' . number_format($totalExpenses, 0, ',', '.'))
+                ->description('Total biaya operasional')
+                ->descriptionIcon('heroicon-m-credit-card')
+                ->color('danger'),
+            Stat::make('Estimasi Laba Bersih', 'Rp ' . number_format($profit, 0, ',', '.'))
+                ->description('Penjualan - Pembelian - Pengeluaran')
+                ->descriptionIcon('heroicon-m-presentation-chart-line')
+                ->color($profit >= 0 ? 'success' : 'danger'),
+            
+            Stat::make('Invoice Belum Lunas', \App\Models\Sale::where('status', 'Belum Lunas')->count())
+                ->description('Piutang yang harus ditagih')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('danger'),
-            \Filament\Widgets\StatsOverviewWidget\Stat::make('Total Invoice', \App\Models\Sale::count())
-                ->description('Total jumlah transaksi penjualan')
-                ->descriptionIcon('heroicon-m-document-text')
-                ->color('warning'),
-            \Filament\Widgets\StatsOverviewWidget\Stat::make('Total Surat Jalan', \App\Models\DeliveryNote::count())
-                ->description('Total jumlah pengiriman')
-                ->descriptionIcon('heroicon-m-truck')
-                ->color('info'),
-            \Filament\Widgets\StatsOverviewWidget\Stat::make('Total Produk', \App\Models\Product::count())
-                ->description('Total item dalam inventaris')
-                ->descriptionIcon('heroicon-m-squares-2x2')
-                ->color('primary'),
-            \Filament\Widgets\StatsOverviewWidget\Stat::make('Total Pelanggan', \App\Models\Customer::count())
+            Stat::make('Total Pelanggan', \App\Models\Customer::count())
                 ->description('Total pelanggan terdaftar')
                 ->descriptionIcon('heroicon-m-users')
                 ->color('indigo'),

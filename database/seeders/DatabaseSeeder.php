@@ -15,12 +15,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Settings Default
+        $this->call(SettingSeeder::class);
+
         // Roles
         $this->call(RoleSeeder::class);
 
         // Admin User
         $admin = User::updateOrCreate(
-            ['email' => 'admin@mrluxindonesia.com'],
+            ['email' => 'admin@email.com'],
             [
                 'name' => 'Agung',
                 'password' => bcrypt('password'),
@@ -31,7 +34,7 @@ class DatabaseSeeder extends Seeder
 
         // Gudang User
         $gudang = User::updateOrCreate(
-            ['email' => 'gudang@mrluxindonesia.com'],
+            ['email' => 'gudang@email.com'],
             [
                 'name' => 'Staff Gudang',
                 'password' => bcrypt('password'),
@@ -41,7 +44,7 @@ class DatabaseSeeder extends Seeder
 
         // Kasir User
         $kasir = User::updateOrCreate(
-            ['email' => 'kasir@mrluxindonesia.com'],
+            ['email' => 'kasir@email.com'],
             [
                 'name' => 'Staff Kasir',
                 'password' => bcrypt('password'),
@@ -57,5 +60,11 @@ class DatabaseSeeder extends Seeder
 
         // Specific Users
         $this->call(SpecificUserSeeder::class);
+
+        // Stok Awal, Pembelian & Mutasi Masuk
+        $this->call(StockAndPurchaseSeeder::class);
+
+        // Penjualan, Mutasi Keluar & Pengeluaran Kas
+        $this->call(TransactionSeeder::class);
     }
 }

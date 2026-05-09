@@ -339,12 +339,12 @@
         <div class="header-section">
             <div class="company-info">
                 <div class="logo-box">
-                    <img src="{{ asset('images/logokopsurat.png') }}" alt="Lux Indonesia">
+                    <img src="{{ \App\Models\Setting::get('site_logo') ? asset('storage/' . \App\Models\Setting::get('site_logo')) : asset('images/logokopsurat.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Lux Indonesia') }}">
                 </div>
                 <div class="company-details">
-                    <p style="font-weight: bold; font-size: 12px;">www.mrluxindonesia.com</p>
-                    <p>Tlp: (024) 7624836</p>
-                    <p>Semarang, Indonesia</p>
+                    <p style="font-weight: bold; font-size: 12px;">{{ \App\Models\Setting::get('site_website', 'www.mrluxindonesia.com') }}</p>
+                    <p>Tlp: {{ \App\Models\Setting::get('site_phone', '(024) 7624836') }}</p>
+                    <p>{{ \App\Models\Setting::get('site_address', 'Semarang, Indonesia') }}</p>
                 </div>
             </div>
             <div class="title-meta">

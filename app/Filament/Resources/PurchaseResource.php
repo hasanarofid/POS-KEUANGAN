@@ -21,14 +21,10 @@ class PurchaseResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?string $navigationLabel = 'Pembelian';
     protected static ?string $navigationGroup = 'Pembelian';
+    protected static ?int $navigationSort = 32;
     protected static ?string $slug = 'pembelian';
     protected static ?string $modelLabel = 'Pembelian';
     protected static ?string $pluralModelLabel = 'Pembelian';
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
 
     public static function form(Form $form): Form
     {

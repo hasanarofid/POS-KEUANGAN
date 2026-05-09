@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::table('delivery_note_items', function (Blueprint $table) {
             $table->foreignId('product_id')->nullable()->change();
-            $table->string('description')->nullable()->change();
+            
+            if (!Schema::hasColumn('delivery_note_items', 'description')) {
+                $table->string('description')->nullable()->after('product_id');
+            } else {
+                $table->string('description')->nullable()->change();
+            }
+            
             $table->string('unit')->nullable()->change();
         });
     }

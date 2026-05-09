@@ -22,6 +22,12 @@ class Setting extends Model
 
     public static function set($key, $value)
     {
-        return self::updateOrCreate(['key' => $key], ['value' => $value]);
+        return self::updateOrCreate(
+            ['key' => $key],
+            [
+                'value' => $value,
+                'display_name' => str($key)->replace('_', ' ')->title(),
+            ]
+        );
     }
 }
