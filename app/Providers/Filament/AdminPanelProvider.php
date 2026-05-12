@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Models\Company;
 use App\Models\Setting;
 use Filament\Http\Middleware\Authenticate;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
@@ -29,7 +30,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName(fn () => Setting::get('site_name', 'POS KEUANGAN'))
+            ->tenant(Company::class, slugAttribute: 'slug')
+            ->brandName('ArusKas')
             ->brandLogo(function () {
                 $logo = Setting::get('site_logo');
                 if (!$logo) return asset('images/logo-default.png');

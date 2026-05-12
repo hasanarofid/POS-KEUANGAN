@@ -21,6 +21,11 @@ class UserResource extends Resource
     protected static ?string $navigationGroup = 'User Management';
     protected static ?int $navigationSort = 51;
 
+    public static function isScopedToTenant(): bool
+    {
+        return false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form

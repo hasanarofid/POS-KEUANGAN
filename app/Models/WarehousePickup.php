@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasCompany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Auth;
 
 class WarehousePickup extends Model
 {
-    use SoftDeletes, LogsActivity;
+    use SoftDeletes, LogsActivity, HasCompany;
     
     protected static function booted()
     {
@@ -36,6 +37,7 @@ class WarehousePickup extends Model
     }
 
     protected $fillable = [
+        'company_id',
         'number',
         'date',
         'type',

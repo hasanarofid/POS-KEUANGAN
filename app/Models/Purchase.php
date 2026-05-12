@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasCompany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class Purchase extends Model
 {
-    use LogsActivity;
+    use LogsActivity, HasCompany;
 
     protected static function booted()
     {
@@ -18,6 +19,7 @@ class Purchase extends Model
     }
 
     protected $fillable = [
+        'company_id',
         'supplier_name',
         'date',
         'total',

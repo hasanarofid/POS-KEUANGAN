@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasCompany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class Customer extends Model
 {
-    use LogsActivity;
+    use LogsActivity, HasCompany;
     protected $fillable = [
+        'company_id',
         'name',
         'code',
         'phone',

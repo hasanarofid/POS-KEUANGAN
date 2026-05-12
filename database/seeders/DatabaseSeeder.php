@@ -66,5 +66,8 @@ class DatabaseSeeder extends Seeder
 
         // Penjualan, Mutasi Keluar & Pengeluaran Kas
         $this->call(TransactionSeeder::class);
+
+        // Multi-tenancy Setup (Assign everything to default company)
+        $this->call(DefaultCompanySeeder::class);
     }
 }

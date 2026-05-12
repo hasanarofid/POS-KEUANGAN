@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasCompany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class StockEntry extends Model
 {
-    use LogsActivity;
+    use LogsActivity, HasCompany;
 
     protected static function booted()
     {
@@ -18,6 +19,7 @@ class StockEntry extends Model
     }
 
     protected $fillable = [
+        'company_id',
         'type',
         'date',
         'note',

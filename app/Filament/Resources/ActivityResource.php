@@ -10,6 +10,11 @@ use Z3d0X\FilamentLogger\Resources\ActivityResource as BaseActivityResource;
 
 class ActivityResource extends BaseActivityResource
 {
+    public static function isScopedToTenant(): bool
+    {
+        return false;
+    }
+
     public static function getGlobalSearchEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         return parent::getGlobalSearchEloquentQuery()->with([

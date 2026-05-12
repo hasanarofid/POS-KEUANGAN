@@ -12,21 +12,21 @@ class SettingSeeder extends Seeder
         $settings = [
             [
                 'key'          => 'site_name',
-                'value'        => 'POS KEUANGAN',
+                'value'        => 'ArusKas',
                 'display_name' => 'Nama Sistem',
                 'type'         => 'text',
                 'group'        => 'general',
             ],
             [
                 'key'          => 'site_logo',
-                'value'        => 'images/logo-default.png',
+                'value'        => 'images/aruskas.png',
                 'display_name' => 'Logo',
                 'type'         => 'image',
                 'group'        => 'general',
             ],
             [
                 'key'          => 'site_favicon',
-                'value'        => 'images/logo-default.png',
+                'value'        => 'images/favicon-default.png',
                 'display_name' => 'Favicon',
                 'type'         => 'image',
                 'group'        => 'general',
