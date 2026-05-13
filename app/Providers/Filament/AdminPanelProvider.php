@@ -21,6 +21,10 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Assets\Css;
+use Illuminate\Support\Facades\Vite;
+
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -30,29 +34,39 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->renderHook(
+                'panels::head.end',
+                fn (): string => '<link rel="stylesheet" href="' . Vite::asset('resources/css/filament-custom.css') . '">'
+            )
+            ->registration()
             ->tenant(Company::class, slugAttribute: 'slug')
             ->brandName('ArusKas')
+            ->sidebarCollapsibleOnDesktop()
             ->brandLogo(function () {
                 $logo = Setting::get('site_logo');
-                if (!$logo) return asset('images/logo-default.png');
+                if (!$logo)
+                    return asset('images/aruskas.png');
                 // Path yang dimulai 'images/' berarti ada di public langsung
-                if (str_starts_with($logo, 'images/')) return asset($logo);
+                if (str_starts_with($logo, 'images/'))
+                    return asset($logo);
                 return asset('storage/' . $logo);
             })
-            ->brandLogoHeight('3rem')
+            ->brandLogoHeight('2.5rem')
             ->favicon(function () {
                 $favicon = Setting::get('site_favicon');
-                if (!$favicon) return asset('images/logo-default.png');
-                if (str_starts_with($favicon, 'images/')) return asset($favicon);
+                if (!$favicon)
+                    return asset('images/favicon-default.png');
+                if (str_starts_with($favicon, 'images/'))
+                    return asset($favicon);
                 return asset('storage/' . $favicon);
             })
             ->darkMode(true)
-            ->defaultThemeMode(\Filament\Enums\ThemeMode::Light)
+            ->defaultThemeMode(\Filament\Enums\ThemeMode::Dark)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Orange,
                 'gray' => Color::Zinc,
             ])
-            ->font('Inter')
+            ->font('Plus Jakarta Sans')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->navigationGroups([

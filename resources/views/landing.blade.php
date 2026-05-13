@@ -1,164 +1,176 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth" x-data="{ darkMode: true }" :class="{ 'dark': darkMode }">
+<html lang="id" class="scroll-smooth" x-data="{ darkMode: true, isScrolled: false, mobileMenuOpen: false }" @scroll.window="isScrolled = window.scrollY > 50" :class="{ 'light': !darkMode, 'overflow-hidden': mobileMenuOpen }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArusKas — Kelola Keuangan Bisnis Tanpa Ribet</title>
+    <title>ArusKas — Ekosistem Finansial & Operasional Bisnis Terpadu</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="{{ asset('images/favicon-default.png') }}">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        [x-cloak] { display: none !important; }
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(1deg); }
-        }
-        @keyframes float-delayed {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(-1deg); }
-        }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-float-delayed { animation: float-delayed 8s ease-in-out infinite; }
-    </style>
 </head>
-<body x-data="{ isScrolled: false, mobileMenuOpen: false }" @scroll.window="isScrolled = window.scrollY > 20" class="font-sans min-h-screen bg-background text-foreground transition-colors duration-300">
-    <div class="bg-blur-gradient absolute -top-40 -left-40 w-[600px] h-[600px] opacity-40"></div>
-    <div class="bg-blur-gradient absolute top-0 right-0 w-[800px] h-[800px] opacity-20"></div>
+<body class="noise bg-grid">
+    <!-- Mesh Background -->
+    <div class="blob blob-orange w-[600px] h-[600px] -top-40 -left-40"></div>
+    <div class="blob blob-amber w-[800px] h-[800px] top-0 right-0"></div>
 
     <!-- Navbar -->
-    <nav :class="isScrolled ? 'bg-background/80 backdrop-blur-xl border-b border-border-subtle' : 'bg-transparent'" class="fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-6 py-4">
+    <nav :class="isScrolled ? 'glass py-3 border-b shadow-lg' : 'py-5 bg-transparent border-transparent'" class="fixed top-0 left-0 right-0 z-[100] transition-all duration-500 px-4 md:px-10">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <img src="{{ asset('images/favicon-default.png') }}" class="w-8 h-8 rounded-lg shadow-lg shadow-accent/20" alt="ArusKas Logo">
-                <span class="text-xl font-black tracking-tighter">ArusKas.</span>
+            <div class="flex items-center gap-3 group">
+                <div class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center transition-transform group-hover:scale-110">
+                    <img src="{{ asset('images/favicon-default.png') }}" class="w-full h-full object-contain" alt="Logo">
+                </div>
+                <span class="text-xl md:text-2xl font-extrabold tracking-tighter">ArusKas.</span>
             </div>
             
-            <div class="hidden lg:flex items-center gap-10 text-sm font-medium opacity-70">
-                <a href="#fitur" class="hover:text-accent transition-colors">Fitur</a>
-                <a href="#harga" class="hover:text-accent transition-colors">Harga</a>
-                <a href="#faq" class="hover:text-accent transition-colors">FAQ</a>
+            <div class="hidden lg:flex items-center gap-10 text-sm font-semibold opacity-60">
+                <a href="#fitur" class="hover:text-accent-primary transition-colors">Fitur Utama</a>
+                <a href="#solusi" class="hover:text-accent-primary transition-colors">Solusi Bisnis</a>
+                <a href="#harga" class="hover:text-accent-primary transition-colors">Paket Layanan</a>
             </div>
 
-            <div class="flex items-center gap-2 md:gap-4">
-                <button @click="darkMode = !darkMode" class="p-2 opacity-70 hover:opacity-100 transition-opacity">
-                    <span x-show="!darkMode">🌙</span>
+            <div class="flex items-center gap-2">
+                <button @click="darkMode = !darkMode" class="p-2 rounded-xl border border-border-glass hover:bg-accent-primary/10 transition-colors">
                     <span x-show="darkMode">☀️</span>
+                    <span x-show="!darkMode">🌙</span>
                 </button>
-                @guest
-                    <a href="/admin/login" class="text-sm font-medium px-2 hover:text-accent transition-colors">Masuk</a>
-                    <a href="/admin/register" class="bg-foreground text-background text-sm font-bold px-6 py-3 rounded-full hover:scale-[1.02] active:scale-[0.98] transition-all">
-                        Coba Gratis
-                    </a>
-                @else
-                    <a href="/admin" class="bg-accent text-white text-sm font-bold px-6 py-3 rounded-full hover:scale-[1.02] active:scale-[0.98] transition-all">
-                        Dashboard
-                    </a>
-                @endguest
-                <!-- Mobile Menu Button -->
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden p-2 text-2xl">
+                
+                <div class="flex items-center gap-2">
+                    @guest
+                        <a href="/admin/login" class="hidden sm:block text-sm font-bold px-2 hover:text-accent-primary transition-colors">Masuk</a>
+                        <a href="#register" class="btn-glow text-[10px] md:text-sm px-4 md:px-6 py-2 md:py-3">Coba Gratis</a>
+                    @else
+                        <a href="/admin" class="btn-glow text-[10px] md:text-sm px-4 md:px-6 py-2 md:py-3">Dashboard</a>
+                    @endguest
+                </div>
+
+                <!-- Mobile Toggle -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden p-2 text-xl ml-1 relative z-[110]">
                     <span x-show="!mobileMenuOpen">☰</span>
                     <span x-show="mobileMenuOpen">✕</span>
                 </button>
             </div>
         </div>
-
-        <!-- Mobile Menu Overlay -->
-        <div x-show="mobileMenuOpen" x-cloak x-transition class="fixed inset-0 top-[72px] bg-background z-[90] lg:hidden p-6 flex flex-col gap-8 text-center pt-20">
-            <a @click="mobileMenuOpen = false" href="#fitur" class="text-2xl font-bold">Fitur</a>
-            <a @click="mobileMenuOpen = false" href="#harga" class="text-2xl font-bold">Harga</a>
-            <a @click="mobileMenuOpen = false" href="#faq" class="text-2xl font-bold">FAQ</a>
-            <hr class="border-border-subtle">
-            @guest
-                <a href="/admin/login" class="text-xl font-medium">Masuk</a>
-                <a href="/admin/register" class="bg-accent text-white py-4 rounded-full text-xl font-bold">Mulai Sekarang</a>
-            @else
-                <a href="/admin" class="bg-accent text-white py-4 rounded-full text-xl font-bold">Ke Dashboard</a>
-            @endguest
-        </div>
     </nav>
 
+    <!-- Mobile Menu Overlay -->
+    <div x-show="mobileMenuOpen" 
+         x-cloak 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-x-full"
+         x-transition:enter-end="opacity-100 translate-x-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-x-0"
+         x-transition:leave-end="opacity-0 translate-x-full"
+         class="fixed inset-0 bg-background/98 backdrop-blur-2xl z-[105] lg:hidden flex flex-col items-center justify-center p-8 text-center overflow-y-auto">
+        
+        <!-- Dedicated Close Button for Overlay -->
+        <button @click="mobileMenuOpen = false" class="absolute top-8 right-8 p-3 bg-white/5 border border-border-glass rounded-full text-2xl hover:bg-accent-primary/10 transition-all">
+            ✕
+        </button>
+
+        <div class="flex flex-col gap-6 w-full max-w-sm">
+            <div class="flex justify-center mb-6">
+                <img src="{{ asset('images/favicon-default.png') }}" class="w-16 h-16 object-contain" alt="Logo">
+            </div>
+            
+            <a @click="mobileMenuOpen = false" href="#fitur" class="text-2xl md:text-3xl font-black tracking-tighter hover:text-accent-primary transition-colors">Fitur Utama</a>
+            <a @click="mobileMenuOpen = false" href="#harga" class="text-2xl md:text-3xl font-black tracking-tighter hover:text-accent-primary transition-colors">Paket Layanan</a>
+            <a @click="mobileMenuOpen = false" href="#register" class="text-2xl md:text-3xl font-black tracking-tighter hover:text-accent-primary transition-colors">Daftar Sekarang</a>
+            
+            <div class="h-px bg-border-subtle w-full my-4"></div>
+            
+            @guest
+                <a href="/admin/login" class="text-lg font-bold opacity-60">Masuk ke Akun</a>
+                <a @click="mobileMenuOpen = false" href="#register" class="btn-glow text-xl py-5 w-full justify-center">Mulai Gratis</a>
+            @else
+                <a href="/admin" class="btn-glow text-xl py-5 w-full justify-center">Buka Dashboard</a>
+            @endguest
+        </div>
+    </div>
+
     <!-- Hero Section -->
-    <section class="relative pt-32 pb-20 md:pt-60 md:pb-40 px-6 overflow-hidden">
-        <div class="max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-16 lg:gap-20 items-center">
-            <div class="relative z-10 text-center lg:text-left">
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/20 bg-accent-soft text-accent text-xs font-bold mb-8 uppercase tracking-widest">
-                    <span>⚡ Sistem Keuangan Masa Depan</span>
+    <section class="relative pt-32 pb-20 md:pt-44 md:pb-32 px-4 md:px-6 overflow-hidden text-center lg:text-left">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 md:gap-20 items-center">
+            <div class="relative z-10">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-accent-primary text-[10px] md:text-xs font-bold mb-6 md:mb-8 uppercase tracking-widest border-accent-primary/20 mx-auto lg:mx-0">
+                    <span class="w-2 h-2 rounded-full bg-accent-primary anim-pulse"></span>
+                    Solusi Ekosistem Bisnis Terpercaya
                 </div>
 
-                <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-8 tracking-tight leading-[1.1]">
-                    Bisnis lebih <br> 
-                    <span class="text-accent underline decoration-accent/20 decoration-wavy underline-offset-8">terkontrol</span>, <br>
-                    Profit lebih maksimal.
+                <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 md:mb-8 tracking-tighter leading-[1.15] md:leading-[1.05]">
+                    Kendalikan <br class="hidden md:block"> 
+                    <span class="gradient-text italic">Arus Kas Bisnis</span> <br class="hidden md:block">
+                    Lebih Cerdas.
                 </h1>
 
-                <p class="text-base sm:text-lg opacity-70 mb-12 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                    Hentikan pencatatan manual yang melelahkan. ArusKas memberikan Anda dashboard finansial real-time untuk memantau setiap rupiah dalam bisnis Anda.
+                <p class="text-sm md:text-lg lg:text-xl text-text-secondary mb-8 md:mb-12 leading-relaxed max-w-xl mx-auto lg:mx-0 px-4 md:px-0">
+                    Sederhanakan manajemen keuangan, inventori, dan logistik dalam satu platform terintegrasi. Maksimalkan profitabilitas dengan data real-time.
                 </p>
 
-                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                    @guest
-                        <a href="/admin/register" class="bg-accent text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-[1.03] active:scale-[0.98] transition-all shadow-[0_20px_50px_rgba(245,158,11,0.3)] flex items-center justify-center gap-3 group">
-                            Coba Gratis Sekarang
-                        </a>
-                    @else
-                        <a href="/admin" class="bg-accent text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-[1.03] active:scale-[0.98] transition-all shadow-[0_20px_50px_rgba(245,158,11,0.3)] flex items-center justify-center gap-3 group">
-                            Masuk ke Dashboard
-                        </a>
-                    @endguest
-                    <a href="#fitur" class="px-8 py-4 border border-border-subtle rounded-full font-bold text-lg hover:bg-accent-soft transition-all flex items-center justify-center gap-3">
-                        Lihat Fitur
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start px-6 sm:px-0">
+                    <a href="#register" class="btn-glow text-sm md:text-lg px-8 md:px-10 py-4 md:py-5">
+                        Daftar Gratis Sekarang
                     </a>
+                    <a href="#fitur" class="btn-ghost text-sm md:text-lg px-8 md:px-10 py-4 md:py-5">
+                        Pelajari Fitur
+                    </a>
+                </div>
+
+                <div class="mt-10 md:mt-12 flex flex-wrap items-center justify-center lg:justify-start gap-6 md:gap-8 opacity-40 grayscale scale-75 md:scale-100">
+                    <span class="text-[10px] md:text-sm font-bold uppercase tracking-widest italic">Dipercaya oleh</span>
+                    <div class="flex gap-4 md:gap-6 font-black text-lg md:text-xl italic">
+                        <span>CORP.X</span>
+                        <span>FINANCE.ID</span>
+                        <span>UMKM.PLUS</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="relative w-full aspect-square md:h-[600px] flex items-center justify-center group min-w-0 mt-12 lg:mt-0">
-                <!-- Main Glow -->
-                <div class="absolute inset-0 bg-accent/10 blur-[100px] rounded-full opacity-30"></div>
+            <div class="relative mt-8 lg:mt-0">
+                <div class="blob blob-orange w-[250px] h-[250px] md:w-[400px] md:h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20"></div>
                 
-                <!-- Floating Element 1: Main Image (CSS Mockup) -->
-                <div class="relative w-full max-w-[500px] aspect-[4/3] bg-slate-900 border border-white/10 rounded-[32px] overflow-hidden shadow-2xl animate-float p-4 flex flex-col gap-4">
-                    <div class="flex items-center gap-2 border-b border-white/5 pb-2">
-                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                        <div class="w-2 h-2 rounded-full bg-amber-500"></div>
-                        <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                        <div class="h-2 w-20 bg-white/10 rounded-full ml-4"></div>
+                <div class="mockup relative z-10 p-4 aspect-[4/3] flex flex-col gap-3 md:gap-4 group anim-float scale-90 md:scale-100">
+                    <div class="flex items-center gap-2 border-b border-white/5 pb-2 md:pb-3">
+                        <div class="flex gap-1.5">
+                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-red-500/50"></div>
+                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-amber-500/50"></div>
+                            <div class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-emerald-500/50"></div>
+                        </div>
+                        <div class="h-3 md:h-4 w-20 md:w-32 bg-white/5 rounded-full ml-4"></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="h-20 bg-white/5 rounded-xl"></div>
-                        <div class="h-20 bg-white/5 rounded-xl"></div>
-                        <div class="h-20 bg-white/5 rounded-xl"></div>
+                    <div class="grid grid-cols-3 gap-2 md:gap-4">
+                        <div class="h-16 md:h-24 bg-accent-primary/10 rounded-xl md:rounded-2xl border border-accent-primary/10"></div>
+                        <div class="h-16 md:h-24 bg-accent-secondary/10 rounded-xl md:rounded-2xl border border-accent-secondary/10"></div>
+                        <div class="h-16 md:h-24 bg-accent-emerald/10 rounded-xl md:rounded-2xl border border-accent-emerald/10"></div>
                     </div>
-                    <div class="flex-1 bg-white/5 rounded-xl relative overflow-hidden p-4">
-                        <div class="absolute inset-0 bg-gradient-to-t from-accent/20 to-transparent"></div>
-                        <div class="h-full w-full flex items-end">
-                            <div class="w-full h-1/2 flex items-end gap-1">
-                                <div class="flex-1 bg-accent/40 rounded-t-sm h-[40%]"></div>
-                                <div class="flex-1 bg-accent/40 rounded-t-sm h-[70%]"></div>
-                                <div class="flex-1 bg-accent/40 rounded-t-sm h-[50%]"></div>
-                                <div class="flex-1 bg-accent/60 rounded-t-sm h-[90%]"></div>
-                                <div class="flex-1 bg-accent/40 rounded-t-sm h-[60%]"></div>
-                            </div>
+                    <div class="flex-1 bg-white/5 rounded-xl md:rounded-2xl relative overflow-hidden p-4 md:p-6 border border-white/5">
+                        <div class="absolute inset-0 bg-gradient-to-t from-accent-primary/10 to-transparent"></div>
+                        <div class="h-full w-full flex items-end gap-2 md:gap-3">
+                            <div class="flex-1 bg-accent-primary/40 rounded-t h-[40%]"></div>
+                            <div class="flex-1 bg-accent-primary/60 rounded-t h-[75%]"></div>
+                            <div class="flex-1 bg-accent-primary/40 rounded-t h-[55%]"></div>
+                            <div class="flex-1 bg-accent-secondary/50 rounded-t h-[85%]"></div>
+                            <div class="flex-1 bg-accent-primary/40 rounded-t h-[45%]"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Floating Element 2: Stats Card -->
-                <div class="absolute top-0 right-0 md:-right-10 bg-background/90 backdrop-blur-xl border border-accent/20 p-4 md:p-6 rounded-2xl shadow-2xl animate-float-delayed z-20 scale-75 md:scale-100">
-                    <div class="text-[10px] uppercase font-black tracking-widest opacity-40 mb-2">Revenue</div>
-                    <div class="text-xl md:text-2xl font-black text-accent">+420M</div>
-                    <div class="mt-1 text-emerald-500 text-[10px] font-bold">📈 +24.8%</div>
+                <!-- Floating Data Points -->
+                <div class="absolute -top-5 -right-5 md:-top-10 md:-right-10 glass p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-2xl anim-float-d z-20 scale-75 md:scale-100">
+                    <div class="text-[8px] md:text-[10px] uppercase font-bold tracking-widest text-text-muted mb-1">Pertumbuhan</div>
+                    <div class="text-2xl md:text-3xl font-extrabold text-accent-emerald">+124%</div>
                 </div>
 
-                <!-- Floating Element 3: User Activity -->
-                <div class="absolute bottom-10 -left-5 md:-left-20 bg-background/90 backdrop-blur-xl border border-white/10 p-4 rounded-xl shadow-2xl animate-float z-30 scale-75 md:scale-100 hidden sm:block">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">JD</div>
+                <div class="absolute -bottom-5 -left-5 md:-bottom-10 md:-left-10 glass p-3 md:p-5 rounded-xl md:rounded-2xl shadow-2xl anim-float z-30 scale-75 md:scale-100 hidden sm:block">
+                    <div class="flex items-center gap-4 text-left">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-accent-secondary/20 flex items-center justify-center text-accent-secondary">⚡</div>
                         <div>
-                            <div class="text-[10px] font-bold">Order Baru</div>
-                            <div class="text-[8px] opacity-50">Baru saja • Rp 2.500.000</div>
+                            <div class="text-[10px] md:text-xs font-bold">Sinkronisasi Aktif</div>
+                            <div class="text-[8px] md:text-[10px] text-text-muted">Data terupdate otomatis</div>
                         </div>
                     </div>
                 </div>
@@ -166,119 +178,174 @@
         </div>
     </section>
 
-    <!-- Social Proof -->
-    <section class="py-12 border-y border-border-subtle bg-grid">
-        <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-center gap-12 md:gap-24 opacity-30 grayscale hover:grayscale-0 transition-all uppercase text-xl font-black italic tracking-tighter">
-            <div>FINANCE.CO</div>
-            <div>UMKMHUB</div>
-            <div>DISTROCORP</div>
-            <div>TECHASIA</div>
-            <div>MONEYLY</div>
+    <!-- Stats -->
+    <section class="py-16 md:py-24 border-y border-border-subtle glass">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
+            <div>
+                <div class="text-2xl md:text-4xl font-extrabold mb-1 md:mb-2">500+</div>
+                <div class="text-[8px] md:text-sm text-text-muted uppercase font-bold tracking-widest px-2">Bisnis Bergabung</div>
+            </div>
+            <div>
+                <div class="text-2xl md:text-4xl font-extrabold mb-1 md:mb-2">Rp 2.4T</div>
+                <div class="text-[8px] md:text-sm text-text-muted uppercase font-bold tracking-widest px-2">Total Transaksi</div>
+            </div>
+            <div>
+                <div class="text-2xl md:text-4xl font-extrabold mb-1 md:mb-2">99.9%</div>
+                <div class="text-[8px] md:text-sm text-text-muted uppercase font-bold tracking-widest px-2">Uptime Sistem</div>
+            </div>
+            <div>
+                <div class="text-2xl md:text-4xl font-extrabold mb-1 md:mb-2">24/7</div>
+                <div class="text-[8px] md:text-sm text-text-muted uppercase font-bold tracking-widest px-2">Dukungan Ahli</div>
+            </div>
         </div>
     </section>
 
     <!-- Features -->
-    <section id="fitur" class="py-32 px-6">
+    <section id="fitur" class="py-20 md:py-32 px-6">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-16 max-w-2xl mx-auto text-center">
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-6">Satu Platform, Semua Kebutuhan Bisnis.</h2>
-                <p class="text-lg opacity-70 leading-relaxed">Kami tidak hanya mencatat uang masuk. ArusKas dirancang untuk menjadi 'pusat komando' operasional bisnis Anda setiap harinya.</p>
+            <div class="mb-12 md:mb-20 max-w-3xl mx-auto text-center reveal">
+                <h2 class="text-3xl md:text-6xl font-extrabold mb-6 md:mb-8 leading-tight">Satu Sistem,<br class="md:hidden"> Keunggulan Tanpa Batas.</h2>
+                <p class="text-sm md:text-lg text-text-secondary leading-relaxed px-4 md:px-0">ArusKas menghadirkan ekosistem modular untuk efisiensi maksimal bisnis Anda.</p>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Feature Cards -->
-                <div class="p-8 border border-border-subtle bg-white/[0.05] dark:bg-white/[0.02] asymmetric-border hover:bg-accent-soft hover:border-accent/30 transition-all group">
-                    <div class="w-12 h-12 bg-accent-soft rounded-2xl flex items-center justify-center mb-6 text-accent font-bold group-hover:scale-110 transition-transform text-2xl">💰</div>
-                    <h3 class="text-xl font-bold mb-4">Dashboard Analitik</h3>
-                    <p class="text-sm opacity-70 leading-relaxed">Lihat performa bisnis secara visual. Laba rugi, pengeluaran terbesar, dan proyeksi cashflow dalam hitungan detik.</p>
+            <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+                <div class="feature-card reveal reveal-d1 p-6 md:p-8">
+                    <div class="feature-icon text-xl md:text-2xl">📈</div>
+                    <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">Analitik Finansial</h3>
+                    <p class="text-xs md:text-base text-text-secondary leading-relaxed">Visualisasi data keuangan yang presisi. Pantau profitabilitas secara instan.</p>
                 </div>
-                <div class="p-8 border border-border-subtle bg-white/[0.05] dark:bg-white/[0.02] asymmetric-border hover:bg-accent-soft hover:border-accent/30 transition-all group">
-                    <div class="w-12 h-12 bg-accent-soft rounded-2xl flex items-center justify-center mb-6 text-accent font-bold group-hover:scale-110 transition-transform text-2xl">📦</div>
-                    <h3 class="text-xl font-bold mb-4">Manajemen Inventori</h3>
-                    <p class="text-sm opacity-70 leading-relaxed">Kelola stok multi-gudang dengan mudah. Notifikasi otomatis saat stok menipis agar penjualan tidak terhambat.</p>
+                <div class="feature-card reveal reveal-d2 p-6 md:p-8">
+                    <div class="feature-icon text-xl md:text-2xl">📦</div>
+                    <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">Manajemen Stok</h3>
+                    <p class="text-xs md:text-base text-text-secondary leading-relaxed">Pelacakan stok cerdas multi-gudang dengan notifikasi otomatis.</p>
                 </div>
-                <div class="p-8 border border-border-subtle bg-white/[0.05] dark:bg-white/[0.02] asymmetric-border hover:bg-accent-soft hover:border-accent/30 transition-all group">
-                    <div class="w-12 h-12 bg-accent-soft rounded-2xl flex items-center justify-center mb-6 text-accent font-bold group-hover:scale-110 transition-transform text-2xl">💳</div>
-                    <h3 class="text-xl font-bold mb-4">Point of Sale (POS)</h3>
-                    <p class="text-sm opacity-70 leading-relaxed">Sistem kasir modern yang terintegrasi langsung dengan database stok dan laporan keuangan bulanan Anda.</p>
+                <div class="feature-card reveal reveal-d3 p-6 md:p-8">
+                    <div class="feature-icon text-xl md:text-2xl">💳</div>
+                    <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">Sistem POS Modern</h3>
+                    <p class="text-xs md:text-base text-text-secondary leading-relaxed">Transaksi kasir cepat terintegrasi langsung dengan database inventori.</p>
                 </div>
-                <div class="md:col-span-2 p-8 border border-border-subtle bg-white/[0.05] dark:bg-white/[0.02] asymmetric-border hover:bg-accent-soft hover:border-accent/30 transition-all group">
-                    <div class="w-12 h-12 bg-accent-soft rounded-2xl flex items-center justify-center mb-6 text-accent font-bold group-hover:scale-110 transition-transform text-2xl">🚚</div>
-                    <h3 class="text-xl font-bold mb-4">Surat Jalan & Logistik</h3>
-                    <p class="text-sm opacity-70 leading-relaxed">Buat surat jalan otomatis dari setiap invoice. Pantau status pengiriman dan penerimaan barang secara real-time.</p>
+                <div class="md:col-span-2 feature-card reveal reveal-d4 p-6 md:p-8">
+                    <div class="flex flex-col md:flex-row gap-6 md:gap-10 items-center text-center md:text-left">
+                        <div class="flex-1">
+                            <div class="feature-icon text-xl md:text-2xl mx-auto md:mx-0">🚚</div>
+                            <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">Logistik & Surat Jalan</h3>
+                            <p class="text-xs md:text-base text-text-secondary leading-relaxed">Kelola pengiriman dan armada secara terpadu dalam satu dasbor pusat.</p>
+                        </div>
+                        <div class="w-full md:w-64 h-24 md:h-40 bg-accent-primary/5 border border-accent-primary/10 rounded-xl md:rounded-2xl flex items-center justify-center font-bold text-accent-primary text-[8px] md:text-xs italic tracking-tighter">
+                            [ Modul Logistik Terpadu ]
+                        </div>
+                    </div>
                 </div>
-                <div class="p-8 border border-border-subtle bg-white/[0.05] dark:bg-white/[0.02] asymmetric-border hover:bg-accent-soft hover:border-accent/30 transition-all group">
-                    <div class="w-12 h-12 bg-accent-soft rounded-2xl flex items-center justify-center mb-6 text-accent font-bold group-hover:scale-110 transition-transform text-2xl">🛡️</div>
-                    <h3 class="text-xl font-bold mb-4">Keamanan Data</h3>
-                    <p class="text-sm opacity-70 leading-relaxed">Data Anda terenkripsi standar bank dengan backup harian. Fokus pada bisnis, serahkan keamanan data pada kami.</p>
+                <div class="feature-card reveal reveal-d5 p-6 md:p-8">
+                    <div class="feature-icon text-xl md:text-2xl">🛡️</div>
+                    <h3 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">Keamanan Data</h3>
+                    <p class="text-xs md:text-base text-text-secondary leading-relaxed">Enkripsi AES-256 dengan backup otomatis harian yang terjamin.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Pricing -->
-    <section id="harga" class="py-32 px-6">
+    <section id="harga" class="py-20 md:py-32 px-6">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-16 max-w-2xl mx-auto text-center">
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-6">Investasi yang Berbanding Lurus dengan Pertumbuhan.</h2>
-                <p class="text-lg opacity-70 leading-relaxed">Pilih paket yang sesuai dengan skala bisnis Anda saat ini. Bisa upgrade kapan saja.</p>
+            <div class="mb-12 md:mb-20 max-w-2xl mx-auto text-center reveal">
+                <h2 class="text-3xl md:text-4xl font-extrabold mb-4 md:mb-6">Investasi Masa Depan Bisnis.</h2>
+                <p class="text-sm md:text-lg text-text-secondary leading-relaxed px-4 md:px-0">Pilih paket yang sesuai. Transparan, tanpa biaya tambahan.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8 items-end">
-                <div class="p-8 border border-border-subtle bg-white/[0.05] dark:bg-white/[0.01] rounded-[32px]">
-                    <div class="text-sm font-black uppercase tracking-widest opacity-40 mb-4">Starter</div>
-                    <div class="text-4xl font-black mb-2">Gratis</div>
-                    <ul class="space-y-4 my-8 text-sm opacity-60">
-                        <li>• Maks 100 transaksi/bln</li>
-                        <li>• 1 User & 1 Gudang</li>
+            <div class="grid md:grid-cols-3 gap-8 md:gap-8 items-end px-4 md:px-0">
+                <div class="pricing-card reveal p-6 md:p-8">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-4 md:mb-6">Standard</div>
+                    <div class="text-4xl md:text-5xl font-extrabold mb-4 md:mb-6">Gratis</div>
+                    <ul class="space-y-3 md:space-y-5 mb-8 md:mb-10 text-xs md:text-sm font-medium">
+                        <li class="flex items-center gap-2 md:gap-3"><span class="text-accent-emerald">✓</span> 100 Transaksi / Bulan</li>
+                        <li class="flex items-center gap-2 md:gap-3"><span class="text-accent-emerald">✓</span> 1 Gudang & 1 User</li>
                     </ul>
-                    <button class="w-full py-3 border border-border-subtle rounded-full font-bold hover:bg-accent-soft transition-all">Pilih Paket</button>
+                    <a href="#register" class="btn-ghost w-full justify-center py-3">Mulai Gratis</a>
                 </div>
-                <div class="p-10 border-2 border-accent bg-accent-soft rounded-[40px] relative shadow-[0_30px_100px_rgba(245,158,11,0.1)] md:scale-105 z-10">
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full">Populer</div>
-                    <div class="text-sm font-black uppercase tracking-widest text-accent mb-4">Business Pro</div>
-                    <div class="text-5xl font-black mb-2 text-accent">Rp 199k<span class="text-lg opacity-40 font-medium text-foreground">/bln</span></div>
-                    <ul class="space-y-4 my-8 text-sm font-medium">
-                        <li>• Transaksi Tanpa Batas</li>
-                        <li>• Multi-User & Multi-Gudang</li>
-                        <li>• Laporan Laba Rugi Detail</li>
+                
+                <div class="pricing-card pricing-popular reveal p-8 md:p-10 scale-100 md:scale-105 my-8 md:my-0">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent-primary text-white text-[8px] md:text-[10px] font-black uppercase tracking-widest px-4 md:px-5 py-2 rounded-full">Paling Populer</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-accent-primary mb-4 md:mb-6">Professional</div>
+                    <div class="text-4xl md:text-6xl font-extrabold mb-2 text-accent-primary">Rp 199k</div>
+                    <div class="text-[8px] md:text-[10px] font-bold text-text-muted mb-6 md:mb-8 italic">PER BULAN / FLAT RATE</div>
+                    <ul class="space-y-4 md:space-y-5 mb-8 md:mb-10 text-xs md:text-sm font-semibold">
+                        <li class="flex items-center gap-2 md:gap-3"><span class="text-accent-primary">✓</span> Transaksi Tanpa Batas</li>
+                        <li class="flex items-center gap-2 md:gap-3"><span class="text-accent-primary">✓</span> Multi-Gudang & User</li>
+                        <li class="flex items-center gap-2 md:gap-3"><span class="text-accent-primary">✓</span> Laporan Detail</li>
                     </ul>
-                    <button class="w-full py-4 bg-accent text-white rounded-full font-bold shadow-xl hover:scale-[1.02] transition-all">Mulai Langganan</button>
+                    <a href="#register" class="btn-glow w-full justify-center text-base md:text-lg py-4">Daftar Sekarang</a>
                 </div>
-                <div class="p-8 border border-border-subtle bg-white/[0.05] dark:bg-white/[0.01] rounded-[32px]">
-                    <div class="text-sm font-black uppercase tracking-widest opacity-40 mb-4">Enterprise</div>
-                    <div class="text-4xl font-black mb-2">Custom</div>
-                    <ul class="space-y-4 my-8 text-sm opacity-60">
-                        <li>• Akses API & Integrasi</li>
-                        <li>• Training On-site</li>
+
+                <div class="pricing-card reveal p-6 md:p-8">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-4 md:mb-6">Enterprise</div>
+                    <div class="text-4xl md:text-5xl font-extrabold mb-4 md:mb-6">Custom</div>
+                    <ul class="space-y-3 md:space-y-5 mb-8 md:mb-10 text-xs md:text-sm font-medium">
+                        <li class="flex items-center gap-2 md:gap-3"><span class="text-accent-emerald">✓</span> Akses API Dedicated</li>
+                        <li class="flex items-center gap-2 md:gap-3"><span class="text-accent-emerald">✓</span> Training On-site</li>
                     </ul>
-                    <button class="w-full py-3 border border-border-subtle rounded-full font-bold hover:bg-accent-soft transition-all">Hubungi Sales</button>
+                    <a href="#" class="btn-ghost w-full justify-center py-3">Hubungi Sales</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ -->
-    <section id="faq" class="py-32 px-6 border-t border-border-subtle">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-extrabold mb-12">Sering Ditanyakan.</h2>
-            <div class="space-y-2">
-                <div x-data="{ open: false }" class="border-b border-border-subtle py-6">
-                    <button @click="open = !open" class="w-full flex items-center justify-between text-left group">
-                        <span class="text-lg font-bold group-hover:text-accent transition-colors">Apakah data saya aman jika berpindah ke ArusKas?</span>
-                        <span x-text="open ? '-' : '+'" class="text-2xl text-accent"></span>
-                    </button>
-                    <div x-show="open" x-cloak class="pt-4 text-sm opacity-70 leading-relaxed">
-                        Tentu. Kami menggunakan enkripsi AES-256 dan server berbasis cloud dengan redundansi tinggi. Data Anda aman dan dapat diekspor kapan saja ke format Excel.
+    <!-- Registration Section -->
+    <section id="register" class="py-20 md:py-32 px-4 md:px-6 relative overflow-hidden">
+        <div class="max-w-4xl mx-auto glass p-8 md:p-16 rounded-[24px] md:rounded-[40px] shadow-2xl relative z-10 text-center">
+            <div class="mb-10 md:mb-12">
+                <h2 class="text-2xl md:text-5xl font-extrabold mb-4 md:mb-6 tracking-tighter">Mulai Transformasi Sekarang</h2>
+                <p class="text-xs md:text-base text-text-secondary max-w-lg mx-auto px-4">Daftar gratis dan nikmati kemudahan kelola Arus Kas Anda dalam satu dasbor terpadu.</p>
+            </div>
+            
+            <form action="/admin/register" method="GET" class="space-y-5 md:space-y-6 text-left max-w-2xl mx-auto px-2">
+                <div class="grid md:grid-cols-2 gap-5 md:gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs md:text-sm font-bold opacity-60">Nama Lengkap</label>
+                        <input type="text" placeholder="Nama Anda" class="w-full bg-white/5 border border-border-glass rounded-xl p-3 md:p-4 text-sm outline-none focus:border-accent-primary transition-colors">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs md:text-sm font-bold opacity-60">Nama Bisnis</label>
+                        <input type="text" placeholder="Nama Bisnis" class="w-full bg-white/5 border border-border-glass rounded-xl p-3 md:p-4 text-sm outline-none focus:border-accent-primary transition-colors">
                     </div>
                 </div>
-                <div x-data="{ open: false }" class="border-b border-border-subtle py-6">
-                    <button @click="open = !open" class="w-full flex items-center justify-between text-left group">
-                        <span class="text-lg font-bold group-hover:text-accent transition-colors">Berapa lama proses setup awal aplikasi?</span>
-                        <span x-text="open ? '-' : '+'" class="text-2xl text-accent"></span>
+                <div class="space-y-2">
+                    <label class="text-xs md:text-sm font-bold opacity-60">Email Kerja</label>
+                    <input type="email" placeholder="email@bisnis.com" class="w-full bg-white/5 border border-border-glass rounded-xl p-3 md:p-4 text-sm outline-none focus:border-accent-primary transition-colors">
+                </div>
+                <div class="pt-4">
+                    <button type="submit" class="btn-glow w-full justify-center text-base md:text-xl py-4 md:py-5">
+                        Buat Akun Gratis
                     </button>
-                    <div x-show="open" x-cloak class="pt-4 text-sm opacity-70 leading-relaxed">
-                        Hanya butuh waktu kurang dari 5 menit. Anda bisa langsung mengimpor data produk dari file Excel yang sudah ada untuk mempercepat proses onboarding.
+                    <p class="text-center text-[10px] md:text-xs text-text-muted mt-6 italic px-4">
+                        Dengan mendaftar, Anda menyetujui Ketentuan & Kebijakan kami.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="py-20 md:py-32 px-6 border-t border-border-subtle">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-2xl md:text-3xl font-extrabold mb-10 md:mb-12 reveal tracking-tighter">Pertanyaan Umum.</h2>
+            <div class="space-y-2 reveal">
+                <div x-data="{ open: false }" class="faq-item">
+                    <button @click="open = !open" class="faq-question py-4">
+                        <span class="text-xs md:text-lg font-bold">Keamanan data bisnis saya?</span>
+                        <span class="text-lg md:text-2xl transition-transform" :class="open ? 'rotate-45 text-accent-primary' : ''">+</span>
+                    </button>
+                    <div x-show="open" x-collapse class="faq-answer mt-2 text-[10px] md:text-sm text-text-secondary leading-relaxed px-1">
+                        Kami mengadopsi standar enkripsi AES-256. Data disimpan dalam cloud terdistribusi dengan redundansi tinggi untuk menjamin ketersediaan 99.9%.
+                    </div>
+                </div>
+                <div x-data="{ open: false }" class="faq-item">
+                    <button @click="open = !open" class="faq-question py-4">
+                        <span class="text-xs md:text-lg font-bold">Bantuan migrasi data?</span>
+                        <span class="text-lg md:text-2xl transition-transform" :class="open ? 'rotate-45 text-accent-primary' : ''">+</span>
+                    </button>
+                    <div x-show="open" x-collapse class="faq-answer mt-2 text-[10px] md:text-sm text-text-secondary leading-relaxed px-1">
+                        Tentu. Kami menyediakan alat impor otomatis untuk Excel/CSV. Tim kami siap membantu proses migrasi agar bisnis tetap berjalan lancar.
                     </div>
                 </div>
             </div>
@@ -286,15 +353,56 @@
     </section>
 
     <!-- Footer -->
-    <footer class="py-20 px-6 border-t border-border-subtle">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 opacity-40 text-[10px] font-black uppercase tracking-[0.2em]">
-            <div>&copy; 2026 ArusKas by Hasan Arofid. All rights reserved.</div>
-            <div class="flex gap-8">
-                <a href="#" class="hover:text-accent transition-colors">Twitter</a>
-                <a href="#" class="hover:text-accent transition-colors">Instagram</a>
-                <a href="#" class="hover:text-accent transition-colors">LinkedIn</a>
+    <footer class="py-16 md:py-20 px-6 border-t border-border-subtle bg-bg-secondary">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 md:mb-20">
+            <div class="md:col-span-2 text-center md:text-left px-4">
+                <div class="flex items-center justify-center md:justify-start gap-3 mb-6">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <img src="{{ asset('images/favicon-default.png') }}" class="w-full h-full object-contain" alt="Logo">
+                    </div>
+                    <span class="text-xl font-extrabold tracking-tighter">ArusKas.</span>
+                </div>
+                <p class="text-xs md:text-sm text-text-secondary max-w-sm mx-auto md:mx-0 leading-relaxed">Solusi teknologi finansial terpadu untuk efisiensi operasional bisnis modern.</p>
+            </div>
+            <div class="text-center md:text-left px-4">
+                <h4 class="text-xs md:text-sm font-bold mb-6">Navigasi</h4>
+                <ul class="space-y-3 text-[10px] md:text-xs text-text-muted">
+                    <li><a href="#fitur" class="hover:text-accent-primary transition-colors">Fitur Produk</a></li>
+                    <li><a href="#harga" class="hover:text-accent-primary transition-colors">Paket Layanan</a></li>
+                    <li><a href="#faq" class="hover:text-accent-primary transition-colors">Bantuan FAQ</a></li>
+                </ul>
+            </div>
+            <div class="text-center md:text-left px-4">
+                <h4 class="text-xs md:text-sm font-bold mb-6">Kontak</h4>
+                <ul class="space-y-3 text-[10px] md:text-xs text-text-muted">
+                    <li>support@aruskas.site</li>
+                    <li>+62 (24) 7624-836</li>
+                    <li>Semarang, Indonesia</li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto pt-10 border-t border-border-subtle flex flex-col md:flex-row justify-between items-center gap-6 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted text-center px-4">
+            <div>&copy; 2026 ArusKas Ecosystem. Developed by Hasan Arofid.</div>
+            <div class="flex gap-6 md:gap-8">
+                <a href="#" class="hover:text-accent-primary transition-colors">Twitter</a>
+                <a href="#" class="hover:text-accent-primary transition-colors">LinkedIn</a>
             </div>
         </div>
     </footer>
+
+    <script>
+        // Intersection Observer for reveal animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+    </script>
 </body>
 </html>

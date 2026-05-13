@@ -1,0 +1,137 @@
+/* 
+   Filament Custom Sidebar - Perfect Professional Density 
+   Final Polish for Spacing & Hierarchy
+*/
+
+.fi-sidebar {
+    background-color: #ffffff !important;
+    border-right: 1px solid #f1f5f9 !important;
+}
+
+.fi-sidebar-nav {
+    padding: 0.5rem !important; /* Compact container padding */
+}
+
+/* Sidebar Item Base */
+.fi-sidebar-item a {
+    color: #475569 !important;
+    border-radius: 8px !important;
+    padding: 0.35rem 0.75rem !important; /* Tighter vertical padding */
+    margin-bottom: 1px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.fi-sidebar-item svg {
+    color: #64748b !important;
+    width: 1.1rem !important;
+    height: 1.1rem !important;
+}
+
+/* Parent Group Labels - Compact & Neater */
+.fi-sidebar-group-label {
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    color: #94a3b8 !important;
+    margin-top: 1rem !important; /* Reduced top gap */
+    margin-bottom: 0.25rem !important; /* Reduced bottom gap */
+    padding-left: 0.75rem !important;
+}
+
+/* Active State - Subtle & Professional */
+.fi-sidebar-item-active a {
+    background-color: #f8fafc !important; /* Very subtle background */
+    color: #ea580c !important; /* Orange text for clarity */
+    font-weight: 600 !important;
+    border-left: 3px solid #ea580c !important; /* Clean left indicator */
+    border-radius: 0 8px 8px 0 !important;
+}
+
+.fi-sidebar-item-active svg {
+    color: #ea580c !important;
+}
+
+/* SUB-MENU STYLING */
+.fi-sidebar-group-items {
+    margin-left: 1.15rem !important;
+    border-left: 1px solid #f1f5f9 !important;
+    padding-left: 0.25rem !important;
+    margin-top: 1px !important;
+    margin-bottom: 4px !important;
+}
+
+/* Child Items inside sub-menu */
+.fi-sidebar-group-items .fi-sidebar-item a {
+    padding: 0.25rem 0.75rem !important; /* Extra tight for sub-items */
+    font-size: 0.825rem !important;
+}
+
+/* Sidebar Header Area */
+.fi-sidebar-header {
+    background-color: #ffffff !important;
+    padding: 1rem 0.75rem !important;
+    border-bottom: 1px solid #f8fafc !important;
+}
+
+/* Tenant Switcher */
+.fi-sidebar-header .fi-ta-header span {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
+/* Fix global span inheritance */
+.fi-sidebar-item span {
+    color: inherit !important;
+}
+
+/* Dark Mode Support - Premium Deep Theme */
+.dark .fi-sidebar {
+    background-color: #09090b !important; /* Zinc 950 */
+    border-right: 1px solid #18181b !important;
+}
+
+.dark .fi-sidebar-header {
+    background-color: #09090b !important;
+    border-bottom: 1px solid #18181b !important;
+}
+
+.dark .fi-sidebar-item a {
+    color: #a1a1aa !important; /* Zinc 400 */
+}
+
+.dark .fi-sidebar-item a:hover {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+.dark .fi-sidebar-item-active a {
+    background-color: #18181b !important;
+    color: #f59e0b !important; /* Orange accent */
+    border-left-color: #f59e0b !important;
+}
+
+.dark .fi-sidebar-group-label {
+    color: #52525b !important; /* Zinc 600 */
+}
+
+.dark .fi-sidebar-header .fi-ta-header span {
+    color: #ffffff !important;
+}
+
+.dark .fi-sidebar-item svg {
+    color: #71717a !important;
+}
+
+.dark .fi-sidebar-item-active svg {
+    color: #f59e0b !important;
+}
+
+.dark .fi-sidebar-group-items {
+    border-left-color: #18181b !important;
+}
